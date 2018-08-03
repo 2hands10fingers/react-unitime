@@ -1,0 +1,18 @@
+// React App
+
+.app-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 50px);
+  padding-bottom: 50px;
+  background-color: $blueLight;
+  font-family: overpass mono;
+}
+
+.dateClock {
+  display: flex;
+  flex-direction: row;
+  width: 240px;
+  font-size: 23px;
+}
