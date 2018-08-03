@@ -6,7 +6,11 @@ class DateClock extends React.Component {
     state = {
         initTime: undefined,
         initHours: undefined,
+        initHoursL: undefined,
+        initHoursR: undefined,
         initMinutes: undefined,
+        initMinutesL: undefined,
+        initMinutesR: undefined,
         initTimezone: undefined,
         stringTimes: {
             initMinutes: undefined
@@ -55,19 +59,40 @@ class DateClock extends React.Component {
                             a[b[0]] = decodeURIComponent(b[1]);
                             return a;
                             }, {});
+
+        
+        
         
         function zeroAdd(time) {
             if (time < 10) return "0" + time
         }
 
+        function zeroAddInt(time) {
+            if (time < 10) {
+                return [0 , time]
+            } else {
+                var newtime = time.toString().split('').map( i => parseInt(i))
+                console.log(newtime)
+                return [newtime[0], newtime[1]]
+            }
 
+        }
 
-        // console.log(urlArgs[""])
+        
+
         let currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         let dateObject = new Date()
         let currentTimeHours = dateObject.getHours();
         let currentTimeMinutes = dateObject.getMinutes();
         let stringMinutes = zeroAdd(currentTimeMinutes)
+
+        let intMinutes = zeroAddInt(currentTimeMinutes)
+        let intMinutesL = intMinutes[0]
+        let intMinutesR = intMinutes[1]
+        let combinedInts = parseInt(intMinutes[0].toString() + intMinutes[1].toString())
+        // console.log(combinedInts)
+
+        // co
 
         if (urlArgs[""] === 'undefined') {
             console.log(currentTimeHours, ':', ',', currentTimeMinutes);
@@ -75,11 +100,14 @@ class DateClock extends React.Component {
             this.setState(
                 { 
                   initHours: currentTimeHours,
-                  initMinutes: currentTimeMinutes,
+                  initMinutes: combinedInts,
+                  initMinutesL: intMinutesL,
+                  initMinutesR: intMinutesR,
                   initTimezone: currentTimeZone,
                   initTime: `${currentTimeHours}:${currentTimeMinutes}, ${currentTimeZone}`,
                   stringTimes: {
-                      initMinutes: stringMinutes}
+                      initMinutes: stringMinutes
+                    }
                 }
             )
             
@@ -94,14 +122,22 @@ class DateClock extends React.Component {
 
     upClick = () => {
         let theState = this.state
-        this.setState({
-            initMinutes: theState.initMinutes + 1
-        })
-        
-        if (theState.initMinutes >= 60) {
+
+        if (theState.initMinutes > 59) {
             this.setState({
-                initMinutes: 0,
-                initHours: theState.initHours + 1
+                initHours: theState.initHours + 1,
+                initHoursL: 0,
+                initHoursR: 0
+            })
+        }
+
+        if (theState.initMinutesR > 9) {
+            this.setState({
+                initMinutesL: 0,
+                initMinutesR: 0,
+                initMinutes: 0
+                
+                // initHours: theState.initHours + 1
             })
         } 
         
@@ -110,7 +146,13 @@ class DateClock extends React.Component {
                 initMinutes: 0,
                 initHours: 0
             })
-        } 
+        }
+        
+        this.setState({
+            initMinutesR: theState.initMinutesR + 1,
+            initMinutes:  theState.initMinutes + 1
+        })
+  
     }
 
     downClick = () => {
@@ -121,13 +163,13 @@ class DateClock extends React.Component {
         
         if (theState.initMinutes <= 0) {
             this.setState({
-                initMinutes: 60,
+                initMinutes: [0, 0],
                 initHours: theState.initHours - 1
             })
 
             if (theState.initMinutes == 60) {
                 this.setState({
-                    initMinutes: "00",
+                    initMinutes: [0,0],
                 })
             }
         } 
@@ -139,8 +181,10 @@ class DateClock extends React.Component {
             <div className="dateClock">
                 <div className="dateClock__left">
                     <UpTimeBlock 
-                        hours={this.state.initHours} 
-                        minutes={this.state.initMinutes} 
+                        hoursL={this.state.initHoursL}
+                        hoursR={this.state.initHoursR} 
+                        minutesL={this.state.initMinutesL}
+                        minutesR={this.state.initMinutesR} 
                         timezone={this.state.initTimezone}></UpTimeBlock>
                 </div>
                 <div className="dateClock__right">
@@ -156,9 +200,6 @@ class DateClock extends React.Component {
 
         )
     }
-
-
-
 }
 
 export default DateClock;
