@@ -2,7 +2,6 @@ import React from 'react';
 import UpTimeBlock from './props/UpTimeProp';
 
 class DateClock extends React.Component {
-
     state = {
         initTime: undefined,
         initHours: undefined,
@@ -11,7 +10,6 @@ class DateClock extends React.Component {
         initMinutesR: undefined,
         initTimezone: undefined
     }
-
 
     timeReset = () => { this.setState({ initHours: 0, initMinutesL: 0, initMinutesR: 0, }) }
     timeArgChecker = timeEntered => {
@@ -22,28 +20,20 @@ class DateClock extends React.Component {
                         b = b.split('=');
                         a[b[0]] = decodeURIComponent(b[1]);
                         return a;
-                        }, {});
-        let currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+                        }, {}),
+            currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
-        console.log(urlArgs);
-
-        (urlArgs["tz"] === undefined) ? 
-            this.setState({ initTimezone: currentTimeZone}) :
-            this.setState({ initTimezone: urlArgs["tz"] })
+        (urlArgs["tz"] === undefined) ? this.setState({ initTimezone: currentTimeZone}) : 
+                                        this.setState({ initTimezone: urlArgs["tz"] })
         
-        if (timeEntered <= 0 || timeEntered.length > 4) { 
-            alert("THAT'S NOT HOW ANYONE ENTERS TIME") 
-            this.timeReset() 
-        }
+        if (timeEntered <= 0 || timeEntered.length > 4) { alert("THAT'S NOT HOW ANYONE ENTERS TIME"); this.timeReset() }
         
         if (timeEntered.length === 4) {
-                let theHours = parseInt(timeEntered.substring(0,2))
-                let theMinutesL = parseInt(timeEntered.substring(2,3))
-                let theMinutesR = parseInt(timeEntered.substring(3,4))
+                let theHours = parseInt(timeEntered.substring(0,2)),
+                    theMinutesL = parseInt(timeEntered.substring(2,3)),
+                    theMinutesR = parseInt(timeEntered.substring(3,4))
                 
-                if (theHours > 24) {
-                    this.timeReset()                    
-                    alert("NAH FAM. YOUR HOURS CAN'T BE HIGHER THAN 24")
+                if (theHours > 24) { this.timeReset(); alert("NAH FAM. YOUR HOURS CAN'T BE HIGHER THAN 24")
                 
                 } else if(theMinutesL > 5 || theMinutesR > 9) {
                     this.timeReset()                    
@@ -73,7 +63,7 @@ class DateClock extends React.Component {
                 initMinutesL: 0,
                 initMinutesR: 0
             })
-        } else {
+        } else if (timeEntered.length < 2){
             this.timeReset()                    
             alert("NAH FAM. YOUR HOURS CAN'T BE HIGHER THAN 24")
         }
@@ -89,27 +79,22 @@ class DateClock extends React.Component {
                             return a;
                             }, {});
 
-        function zeroAdd(time) {
-            if (time < 10) return "0" + time
-        }
-
         function zeroAddInt(time) {
             if (time < 10) {
                 return [0 , time]
             } else {
-                var newtime = time.toString().split('').map( i => parseInt(i))
+                let newtime = time.toString().split('').map( i => parseInt(i))
                 return [newtime[0], newtime[1]]
             }
-
         }
 
-        let currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        let dateObject = new Date()
-        let currentTimeHours = dateObject.getHours();
-        let currentTimeMinutes = dateObject.getMinutes();
-        let intMinutes = zeroAddInt(currentTimeMinutes)
-        let intMinutesL = intMinutes[0]
-        let intMinutesR = intMinutes[1]
+        let currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone,
+            dateObject = new Date(),
+            currentTimeHours = dateObject.getHours(),
+            currentTimeMinutes = dateObject.getMinutes(),
+            intMinutes = zeroAddInt(currentTimeMinutes),
+            intMinutesL = intMinutes[0],
+            intMinutesR = intMinutes[1]
 
         if (urlArgs[""] === 'undefined') {
             console.log(currentTimeHours, ':', ',', currentTimeMinutes);
@@ -125,14 +110,12 @@ class DateClock extends React.Component {
             )
             
         } else {
-            console.log('sup')
             Object.keys(urlArgs).forEach( i => console.log(urlArgs[i]))
-            
             this.timeArgChecker(urlArgs["t"])
-            console.log(this.state)
         }
 
     }
+
 
 
     upClickMinutesL   = () => {
