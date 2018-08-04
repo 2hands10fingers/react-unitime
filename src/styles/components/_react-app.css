@@ -13,6 +13,12 @@
 .dateClock {
   display: flex;
   flex-direction: row;
-  width: 240px;
+  /*width: 240px;*/
   font-size: 23px;
+}
+
+.dateClock__right button, .dateClock__left button {
+    height: 28px;
+    width: 28px;
+    font-size: 10px;
 }
