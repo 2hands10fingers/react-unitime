@@ -18,16 +18,28 @@ class DateClock extends React.Component {
 
     timezones = moment.tz.names()
 
+
+        initTimezone: undefined
+    }
+
+    timeReset = () => { this.setState({ initHours: 0, initMinutesL: 0, initMinutesR: 0, }) }
+
     timeArgChecker = timeEntered => {
-        let urlArgs = window.location.search.slice(1)
+        // Parse URL args. Returns as object.
+        let urlArgs = window.location.search.slice(1) 
                         .split('&')
                         .reduce(function _reduce (/*Object*/ a, /*String*/ b) {
                         b = b.split('=');
                         a[b[0]] = decodeURIComponent(b[1]);
                         return a;
 
+
                         }, {}),
             currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+                        }, {}),
+            currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
 
         (urlArgs["tz"] === undefined) ? this.setState({ initTimezone: currentTimeZone}) : 
                                         this.setState({ initTimezone: urlArgs["tz"] })
@@ -39,6 +51,7 @@ class DateClock extends React.Component {
                     theMinutesL = parseInt(timeEntered.substring(2,3)),
                     theMinutesR = parseInt(timeEntered.substring(3,4))
                 
+
                 
                 if (theHours > 24) { this.timeReset(); alert("NAH FAM. YOUR HOURS CAN'T BE HIGHER THAN 24") }
                 
@@ -48,8 +61,31 @@ class DateClock extends React.Component {
         }
 
 
-            console.log(this.state)
+                if (theHours > 24) { this.timeReset(); alert("NAH FAM. YOUR HOURS CAN'T BE HIGHER THAN 24")
+                
+                } else if(theMinutesL > 5 || theMinutesR > 9) {
+                    this.timeReset()                    
+                    alert("NAH FAM. YOU CAN'T SET MINUTES LIKE THAT")    
+
+                } else {
+
+                    this.setState({
+                        initHours:    theHours,
+                        initMinutesL: theMinutesL,
+                        initMinutesR: theMinutesR
+                    })
+
+                }
         }
+
+
+        if (timeEntered.length === 3) {
+            this.setState({
+                initHours: parseInt(timeEntered.substring(0,1)),
+                initMinutesL: parseInt(timeEntered.substring(1,2))
+            })
+        }
+
 
 
         if (timeEntered.length === 2 && timeEntered < 25) {
@@ -57,10 +93,24 @@ class DateClock extends React.Component {
         
         else if (timeEntered.length < 2) { this.timeReset(); alert("NAH FAM. YOUR HOURS CAN'T BE HIGHER THAN 24")}
 
+
+        if (timeEntered.length === 2 && timeEntered < 25) {
+            this.setState({
+                initHours: parseInt(timeEntered),
+                initMinutesL: 0,
+                initMinutesR: 0
+            })
+        } else if (timeEntered.length < 2){
+            this.timeReset()                    
+            alert("NAH FAM. YOUR HOURS CAN'T BE HIGHER THAN 24")
+        }
+
     }
 
 
     componentDidMount() {
+
+
 
 
 
@@ -76,6 +126,8 @@ class DateClock extends React.Component {
                             }, {});
 
 
+
+
         function zeroAddInt(time) {
             if (time < 10) {
                 return [0 , time]
@@ -86,18 +138,13 @@ class DateClock extends React.Component {
         }
 
 
-        // console.log(urlArgs[""])
-        let currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-
-
-        
-        let dateObject = new Date(),
+        let currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone,
+            dateObject = new Date(),
             currentTimeHours = dateObject.getHours(),
             currentTimeMinutes = dateObject.getMinutes(),
             intMinutes = zeroAddInt(currentTimeMinutes),
             intMinutesL = intMinutes[0],
-            intMinutesR = intMinutes[1];
+            intMinutesR = intMinutes[1]
 
             console.log(dateObject)
 
@@ -107,8 +154,10 @@ class DateClock extends React.Component {
             this.setState(
                 { 
                   initHours: currentTimeHours,
-                  initMinutes: currentTimeMinutes,
+                  initMinutesL: intMinutesL,
+                  initMinutesR: intMinutesR,
                   initTimezone: currentTimeZone,
+
                   initTime: `${currentTimeHours}:${currentTimeMinutes}`,
                   initDate: {  year: dateObject.getUTCFullYear(),
                                month: dateObject.getDate(),
@@ -117,69 +166,50 @@ class DateClock extends React.Component {
                         }
                     }
                 
+
+                  initTime: `${currentTimeHours}:${currentTimeMinutes}, ${currentTimeZone}`
+                }
+
             )
 
             
 
             
         } else {
-
             this.timeArgChecker(urlArgs["t"])
         }
 
     }
 
-    upClick = () => {
-        let theState = this.state
-        this.setState({
-            initMinutes: theState.initMinutes + 1
-        })
-        
-        if (theState.initMinutes >= 60) {
-            this.setState({
-                initMinutes: 0,
-                initHours: theState.initHours + 1
-            })
-        } 
-        
-        if (theState.initHours >= 24) {
-            this.setState({
-                initMinutes: 0,
-                initHours: 0
-            })
-        } 
-    }
 
+    upClickMinutesL   = () => {
+        (this.state.initMinutesL !== 5) ?
+            this.setState({ initMinutesL: this.state.initMinutesL + 1 }) :
+            this.setState({ initMinutesL: 0})
+    }
+    downClickMinutesL = () => {
+            (this.state.initMinutesL !== 0) ?
+            this.setState({ initMinutesL: this.state.initMinutesL - 1}) :
+            this.setState({ initMinutesL: 0})
+    }
+    upClickMinutesR   = () => {
+        (this.state.initMinutesR !== 9) ?
+            this.setState({ initMinutesR: this.state.initMinutesR + 1 }) :
+            this.setState({ initMinutesR: 0})
+    }
+    downClickMinutesR = () => {
+            (this.state.initMinutesR !== 0) ?
+            this.setState({ initMinutesR: this.state.initMinutesR - 1}) :
+            this.setState({ initMinutesR: 0})
+    }
     upClickHours    =   () => {
             (this.state.initHours === 24)  ?
             this.setState({ initHours: 0}) :
             this.setState(
                 { initHours: this.state.initHours + 1}
             )
-    }
+    } 
 
-
-
-    downClick = () => {
-        
-        let theState = this.state
-        
-        this.setState({ initMinutes: theState.initMinutes - 1 })
-        
-        if (theState.initMinutes <= 0) {
-            this.setState({
-                initMinutes: 60,
-                initHours: theState.initHours - 1
-            })
-
-            if (theState.initMinutes == 60) {
-                this.setState({
-                    initMinutes: "00",
-                })
-            }
-        } 
-
-    }
 
     timeZoneConvert = timeZone => { 
         //console.log(this.state['initDate']['fullyear'])  <---- WHY DOESN'T THIS WORK???????
@@ -193,27 +223,38 @@ class DateClock extends React.Component {
             <div className="dateClock">
             <div className="datesplit">{this.dateSplit}</div>
                 <div className="dateClock__left">
-
                     <button onClick={this.upClickHours}>↑</button> 
-                    <button onClick={this.downClickHours}>↓</button>
-                    
+                    <button onClick={this.downClickHours}>↓</button> 
 
                     <UpTimeBlock 
                         hours={this.state.initHours} 
-                        minutes={this.state.initMinutes} 
+                        minutesL={this.state.initMinutesL}
+                        minutesR={this.state.initMinutesR} 
                         timezone={this.state.initTimezone}></UpTimeBlock>
                 </div>
                 <div className="dateClock__right">
+                <button 
+                        className="up-time right" 
+                        onClick={this.upClickMinutesL}>↑</button>
                     <button 
-                        className="up-time" 
-                        onClick={this.upClick}>↑</button>
-                    <button 
+
 
                         className="down-time right" 
                         onClick={this.downClickMinutesR}>↓</button>
                 </div> 
                             <div>
               <ul>{this.timezones.map(item => <TimeZoneProp key={item} timezone={this.timeZoneConvert(item)}></TimeZoneProp>)}</ul>
+
+                        className="down-time" 
+                        onClick={this.downClickMinutesL}>↓</button>
+                        <br></br>
+                    <button 
+                        className="up-time right" 
+                        onClick={this.upClickMinutesR}>↑</button>
+                    <button 
+                        className="down-time right" 
+                        onClick={this.downClickMinutesR}>↓</button>
+                </div>
 
             </div>
             </div>
@@ -224,9 +265,6 @@ class DateClock extends React.Component {
 
         )
     }
-
-
-
 }
 
 export default DateClock;
