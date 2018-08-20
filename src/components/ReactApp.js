@@ -1,5 +1,6 @@
 import React from 'react';
 import DateClock from './DateClock'
+import TimeZoneComp from './TimeZones'
 import Copyright from './Copyright';
 import ReactComponent from './ReactComponent';
 

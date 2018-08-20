@@ -1,9 +1,9 @@
 import React from 'react';
 
+
 	// const TimeZoneProp = (props) => {
 	// 	return (<li>{props.timezone}</li>);
 	// }
-
 
 	const TimeZoneProp = (props) => {
 		return (
@@ -13,6 +13,7 @@ import React from 'react';
 				</li>
 
 		);
+
 
 	}
 export default TimeZoneProp;

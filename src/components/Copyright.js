@@ -3,7 +3,7 @@ import React from 'react';
 class Copyright extends React.Component {
   state = {
     copyrightYear: 2018,
-    currentYear: 2019
+    currentYear: undefined
   };
 
   componentDidMount() {
