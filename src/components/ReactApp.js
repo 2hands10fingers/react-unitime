@@ -9,7 +9,7 @@ class ReactApp extends React.Component {
       <div className="app-container">
         <DateClock />
         {/* <ReactComponent /> */}
-        <Copyright />
+        {/* <Copyright /> */}
       </div>
     );
   }
