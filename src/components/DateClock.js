@@ -9,7 +9,7 @@ import tzList from './props/constVars';
 
 /*
 *  Bugs:     
-*   Decrements skip in odd numbers for minutes
+*   
 *      
 *   
 *  Enhancements:
@@ -57,105 +57,50 @@ class DateClock extends Component {
 
     timeReset = () => { this.setState({ initHours: 0, initMinutesL: 0, initMinutesR: 0, }) }
 
-    /* INCREMENT AND DECREMENT HOURS AND MINUTES ---  START*/
-    upClickMinutesL = () => {
-        (this.state.initMinutesL !== 5) ?
-            this.setState({ initMinutesL: this.state.initMinutesL + 1 }) :
-            this.setState({ initMinutesL: 0 })
+    upTime = ( threshold, affectedTimePoint, secondThreshold ) => {
+        
+        const iterationObjCreate = eatThis => {
+           let stateObj =  {}
+           stateObj[eatThis] = this.state[eatThis] + 1
+           return stateObj
+        }
+
+        const defaultObjCreate = defaultTimePoint => {
+            let stateObj = {}
+            stateObj[defaultTimePoint] = 0
+            return stateObj
+        }
+
+        const finalObj = (timePointKey, timePointValue ) => {
+            let stateObj = {}
+            stateObj[timePointKey] = timePointValue + 1
+            return stateObj
+        }
+
+
+        let replacer = affectedTimePoint
+                                .replace('init', '')
+                                .replace('s', '')
+                                .replace("M", "m");
+
+        replacer = (replacer == "Hour") ? "hourR" : replacer;
+        
+        
+        (this.state[affectedTimePoint] !== threshold) ?
+            this.setState(iterationObjCreate(affectedTimePoint)) :
+            this.setState(defaultObjCreate(affectedTimePoint))
         
         const newTimes = this.state.allTimes.map(obj => {
-            let trasnformHour = incr => (incr > 5) ? -1 : incr,
-                    hourTransformed = trasnformHour(obj.time.minuteL),
-                    newTime = Object.assign({}, obj.time, { minuteL: hourTransformed + 1 });
+            let trasnformHour = incr => (incr > secondThreshold) ? -1 : incr,
+                    hourTransformed = trasnformHour(obj.time[replacer]),
+                    newTime = Object.assign({}, obj.time, finalObj( replacer , hourTransformed ));
             return { time: newTime }
         })
     
         this.setState({ allTimes: newTimes })
-    }
-    downClickMinutesL = () => {
-        (this.state.initMinutesL !== 0) ?
-            this.setState({ initMinutesL: this.state.initMinutesL - 1 }) :
-            this.setState({ initMinutesL: 0 });
-        
-            const newTimes = this.state.allTimes.map(obj => {
-            let trasnformHour = incr => (incr !== 0) ? incr - 1 : 0,
-                hourTransformed = trasnformHour(obj.time.minuteL),
-                newTime = Object.assign({}, obj.time, { minuteL: hourTransformed });     
-                
-                return { time: newTime }
-        })
-    
-        this.setState({ allTimes: newTimes })
-    }
-    upClickMinutesR = () => {
-        (this.state.initMinutesR !== 9) ?
-            this.setState({ initMinutesR: this.state.initMinutesR + 1 }) :
-            this.setState({ initMinutesR: 0 })
-        
-            const newTimes = this.state.allTimes.map(obj => {
-            let trasnformHour = incr => (incr > 8) ? -1 : incr,
-                    hourTransformed = trasnformHour(obj.time.minuteR),
-                    newTime = Object.assign({}, obj.time, { minuteR: hourTransformed + 1 });
-                    
-                    return { time: newTime }
-        })
-    
-        this.setState({ allTimes: newTimes })
 
     }
-    downClickMinutesR = () => {
 
-        
-        (this.state.initMinutesR !== 0) ?
-            this.setState({ initMinutesR: this.state.initMinutesR - 1 }) :
-            this.setState({ initMinutesR: 0 })
-
-        const newTimes = this.state.allTimes.map(obj => {
-            let trasnformHour = incr => (incr > 0 ) ? incr - 1 : incr,
-                accountForZero = decr => (decr === 0) ? 9 : decr,
-                hourTransformed = accountForZero(trasnformHour(obj.time.minuteR + 1)),
-                newTime = Object.assign({}, obj.time, { minuteR: hourTransformed });
-                    
-                return { time: newTime }
-        })
-    
-        this.setState({ allTimes: newTimes })
-    }
-    upClickHours = ()  => {
-        (this.state.initHours === 23) ?
-            this.setState({ initHours: 0 }) :
-            this.setState({ initHours: this.state.initHours + 1 })
-        
-        const newTimes = this.state.allTimes.map(obj => {
-            const trasnformHour = incr => (incr > 22) ? -1 : incr,
-                  hourTransformed = trasnformHour(obj.time.hourR),
-                  newTime = Object.assign({}, obj.time, { hourR: hourTransformed + 1 });
-
-                  return { time: newTime }
-        })
-
-        this.setState({ allTimes: newTimes })
-    }
-    downClickHours = () => {
-        (this.state.initHours === 0 ) ?
-            this.setState({ initHours: 24 }) :
-            this.setState({ initHours: this.state.initHours - 1 })
-
-        const newTimes = this.state.allTimes.map(obj => {
-            const trasnformHour = decr => (decr !== 0) ? decr - 1 : 0,
-                  accountForZero = decr => (decr === 0) ? 23 : decr - 1,    
-                  hourTransformed = accountForZero(trasnformHour(obj.time.hourR)),
-                  newTime = Object.assign({}, obj.time, { hourR: hourTransformed });
-            return {
-                time: newTime
-            }
-        })
-
-        this.setState({ allTimes: newTimes })
-    }
-    /* END  ---- INCREMENT AND DECREMENT HOURS AND MINUTES */
-
-    
     shareTime = () => {
         let zeroAdd  = time => (time < 10) ? "0" + time : time,
             
@@ -169,12 +114,8 @@ class DateClock extends Component {
                 hash: md5(baseArgs).substring(0, 5),
             };
             
-            console.log(argsObject)
-            
             this.setState(argsObject)
-            
             axios.post('process.php', argsObject)
-            
             textArea.value = host + baseArgs
             document.body.appendChild(textArea)
             textArea.select()
@@ -202,9 +143,7 @@ class DateClock extends Component {
             this.setState({ initHours: timeParse(0, 1)})
  
         if (timeEntered.length === 4) {
-            let theHours = timeParse(0, 2),
-                theMinutesL = timeParse(2, 3),
-                theMinutesR = timeParse(3, 4);
+            let theHours = timeParse(0, 2), theMinutesL = timeParse(2, 3), theMinutesR = timeParse(3, 4);
             
             if (theHours > 24) {
                 entryError("NAH FAM. YOUR HOURS CAN'T BE HIGHER THAN 24")
@@ -213,22 +152,15 @@ class DateClock extends Component {
                 entryError("NAH FAM. YOU CAN'T SET MINUTES LIKE THAT")
 
             } else {
-                this.setState({ initHours: theHours, 
-                                initMinutesL: theMinutesL, 
-                                initMinutesR: theMinutesR 
-                            })
+                this.setState({ initHours: theHours, initMinutesL: theMinutesL, initMinutesR: theMinutesR })
             }
         }
 
         if (timeEntered.length === 3)
-            this.setState({ initHours: timeParse(0, 1), 
-                            initMinutesL: timeParse(1, 2) 
-                        })
+            this.setState({ initHours: timeParse(0, 1), initMinutesL: timeParse(1, 2) })
 
         if (timeEntered.length === 2 && timeEntered < 25)
-            this.setState({ initHours: parseInt(timeEntered), 
-                            initMinutesL: 0, initMinutesR: 0 
-                          })
+            this.setState({ initHours: parseInt(timeEntered), initMinutesL: 0, initMinutesR: 0 })
     } //end timeArgChecker()
 
     timeZoneConvert = timeZone => {
@@ -276,9 +208,6 @@ class DateClock extends Component {
             this.timeArgChecker(this.state.initArgs.t)
     }
 
-    /////////////////////////////////////////////
-    // L I F E C Y C L E //////////////////////
-    /////////////////////////////////////////
     componentWillMount() {        
         this.initTimeSet()
         moment.tz.names().forEach(i => this.timeZoneConvert(i))
@@ -299,18 +228,12 @@ class DateClock extends Component {
        console.log("APP SUCCESSFULLY LOADED")
     }
 
-    render() {
+    render() {        
         return(
             <div className="dateClock">
                 <button onClick={this.shareTime}>SHARE</button>
-                <form action="/process.php/" method="post">
-                    <input hidden name="long_url" value={this.state.shareArgs}></input>
-                    <input hidden name="hash" value={this.state.hash}></input>
-                    <button onClick={this.shareTime}>SHARE</button>
-                </form>
                 <div className="dateClock__left">
-                    <button onClick={this.upClickHours}>↑</button>
-                    <button onClick={this.downClickHours}>↓</button>
+                <button onClick={() => this.upTime( 23, "initHours", 22 )}>↑</button>
                     <UpTimeBlock
                         hours={this.state.initHours}
                         minutesL={this.state.initMinutesL}
@@ -320,17 +243,11 @@ class DateClock extends Component {
                 <div className="dateClock__right">
                     <button
                         className="up-time right"
-                        onClick={this.upClickMinutesL}>↑</button>
-                    <button
-                        className="down-time"
-                        onClick={this.downClickMinutesL}>↓</button>
+                        onClick={() => this.upTime( 5, "initMinutesL", 4 )}>↑</button>
                     <br></br>
                     <button
                         className="up-time right"
-                        onClick={this.upClickMinutesR}>↑</button>
-                    <button
-                        className="down-time right"
-                        onClick={this.downClickMinutesR}>↓</button>
+                        onClick={() => this.upTime( 9, "initMinutesR", 8 )}>↑</button>
                     <div className="timeZones">
                         <ul>
                             {this.state.allTimes.map(item =>
