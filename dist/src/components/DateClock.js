@@ -59,25 +59,45 @@ class DateClock extends Component {
 
     upTime = ( threshold, affectedTimePoint, secondThreshold ) => {
         
-        let replacer = affectedTimePoint.replace('init', '').replace('s', '').replace("M", "m");
+        const iterationObjCreate = eatThis => {
+           let stateObj =  {}
+           stateObj[eatThis] = this.state[eatThis] + 1
+           return stateObj
+        }
+
+        const defaultObjCreate = defaultTimePoint => {
+            let stateObj = {}
+            stateObj[defaultTimePoint] = 0
+            return stateObj
+        }
+
+        const finalObj = (timePointKey, timePointValue ) => {
+            let stateObj = {}
+            stateObj[timePointKey] = timePointValue + 1
+            return stateObj
+        }
+
+
+        let replacer = affectedTimePoint
+                                .replace('init', '')
+                                .replace('s', '')
+                                .replace("M", "m");
 
         replacer = (replacer == "Hour") ? "hourR" : replacer;
         
+        
         (this.state[affectedTimePoint] !== threshold) ?
-            this.setState({ [affectedTimePoint]: this.state[affectedTimePoint] + 1}) :
-            this.setState({ [affectedTimePoint] : 0 })
+            this.setState(iterationObjCreate(affectedTimePoint)) :
+            this.setState(defaultObjCreate(affectedTimePoint))
         
         const newTimes = this.state.allTimes.map(obj => {
-            
-            let trasnformTimeUnit = incr => (incr > secondThreshold) ? -1 : incr,
-                
-            timeUnitTransformed = trasnformTimeUnit(obj.time[replacer]),
-            newTime = Object.assign({}, obj.time, { [replacer] : timeUnitTransformed + 1 } );
-            
+            let trasnformHour = incr => (incr > secondThreshold) ? -1 : incr,
+                    hourTransformed = trasnformHour(obj.time[replacer]),
+                    newTime = Object.assign({}, obj.time, finalObj( replacer , hourTransformed ));
             return { time: newTime }
         })
     
-         this.setState({ allTimes: newTimes })
+        this.setState({ allTimes: newTimes })
 
     }
 
@@ -85,11 +105,14 @@ class DateClock extends Component {
         let zeroAdd  = time => (time < 10) ? "0" + time : time,
             
             { initHours, initMinutesL, initMinutesR, initTimezone} = this.state,
-            textArea = document.createElement('textarea'),  
+            textArea = document.createElement('textarea'),
             clock = `${zeroAdd(initHours)}${initMinutesL}${initMinutesR}`,
             host = document.location.host,
             baseArgs = "?t=" + clock + "&tz="+ initTimezone,
-            argsObject = { shareArgs: baseArgs, hash: md5(baseArgs).substring(0, 5) };
+            argsObject = { 
+                shareArgs: baseArgs,
+                hash: md5(baseArgs).substring(0, 5),
+            };
             
             this.setState(argsObject)
             axios.post('process.php', argsObject)
@@ -110,16 +133,14 @@ class DateClock extends Component {
         if (tz !== undefined) {
             (timeZones.some(timeZoneAvailability)) ? 
             this.setState({ initTimezone: tz }) : 
-                entryError("INCORRECT TIMEZONE");
+                tentryError("INCORRECT TIMEZONE");
         }
             
-        if (timeEntered <= 0 || timeEntered.length > 4) {
+        if (timeEntered <= 0 || timeEntered.length > 4)
             entryError("THAT'S NOT HOW ANYONE ENTERS TIME")
-        }
 
-        if (timeEntered.length === 3) {    
+        if (timeEntered.length === 3)
             this.setState({ initHours: timeParse(0, 1)})
-        }
  
         if (timeEntered.length === 4) {
             let theHours = timeParse(0, 2), theMinutesL = timeParse(2, 3), theMinutesR = timeParse(3, 4);
@@ -183,7 +204,7 @@ class DateClock extends Component {
                     initTimezone: currentTimeZone,
                     initTime: `${currentTimeHours}:${intMinutes[0]}${intMinutes[1]}`
                 })
-        : // E L S E
+        :
             this.timeArgChecker(this.state.initArgs.t)
     }
 
@@ -203,8 +224,8 @@ class DateClock extends Component {
             this.setState({ finalArgs: querystring })
     }
     
-    componentDidMount() {     
-        console.log("APP SUCCESSFULLY LOADED");
+    componentDidMount() {
+       console.log("APP SUCCESSFULLY LOADED")
     }
 
     render() {        

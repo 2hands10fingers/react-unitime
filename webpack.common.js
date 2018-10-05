@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/app.js',
+  externals: { bootstrap: 'bootstrap', jQuery: 'jQuery' },
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist')
@@ -13,7 +14,7 @@ module.exports = {
         test: /\.js$/,
         use: 'babel-loader',
         exclude: /node_modules/
-      },
+    },
       // {
       //   test: '',
       //   use: [

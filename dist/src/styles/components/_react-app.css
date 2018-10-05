@@ -1,5 +1,5 @@
 // React App
-/* @import "~bootstrap/scss/bootstrap"; */
+
 .app-container {
   display: flex;
   align-items: center;
@@ -10,13 +10,9 @@
   font-family: overpass mono;
 }
 
-.timeZones ul li {
-  list-style: none;
-}
-
 .dateClock {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   /*width: 240px;*/
   font-size: 23px;
 }

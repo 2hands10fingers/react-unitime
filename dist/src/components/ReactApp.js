@@ -5,7 +5,6 @@ import Copyright from './Copyright';
 import ReactComponent from './ReactComponent';
 
 
-
 class ReactApp extends React.Component {
   render() {
     return (
